@@ -1,0 +1,43 @@
+{
+    "requests": [
+        {
+
+        }
+    ], 
+    "responses": [
+        {
+            "type": "", 
+            "code": ""
+        }
+    ], 
+    "broadcasts": [
+        {
+            "type": "PLAYER_JOIN_ROOM", 
+            "data": {
+                "player": "Player"
+            }, 
+            "to": "rid == rid"
+        }, 
+        {
+            "type": "PLAYER_LEAVE_ROOM", 
+            "data": {
+                "player": "Player"
+            }, 
+            "to": "rid == rid"
+        }, 
+        {
+            "type": "PLAYER_JOIN_ROOM_SPEC", 
+            "data": {
+                "player": "Player"
+            }, 
+            "to": "rid == rid"
+        }, 
+        {
+            "type": "PLAYER_KICKED_FROM_ROOM", 
+            "data": {
+                "player": "Player"
+            }, 
+            "to": "rid == rid"
+        }
+    ]
+}
