@@ -82,8 +82,11 @@ class ClientGUI(ctk.CTk):
         else:
             self.switch_frame(self.entrance_frame)
 
+    def mainloop(self, *args, **kwargs):
         thread = threading.Thread(target=self.listen_thread, daemon=True)
         thread.start()
+
+        return super().mainloop(*args, **kwargs)
 
 
 async def main():
