@@ -4,37 +4,27 @@ import json
 import messages
 
 from managers import ServerHandlerManager
-from handlers import *
-from protocol import MsgType, ColName, Code
+from handlers.base import RequestHandler
+from handlers.server import 
+from protocol import MsgType, ColName, Code, ReqType
 
 
 class ReversiServer(object):
-    def __init__(self, shm: ServerHandlerManager):
-        self._shm = shm
+    def __init__(self, handler: RequestHandler):
+        self._handler = handler
 
     async def ws_handler(self, websocket: ws.ServerConnection):
         message = await websocket.recv()
         if not message:
-            msg = messages.ResponseMessage(code=Code.ERR_NO_DATA).to_json()
-            await websocket.send(msg)
             return
-        raw_data = json.dumps(message)
-        msg_type = raw_data.get(ColName.TYPE.value)
-        if not msg_type:
-            msg = messages.ResponseMessage(Code.ERR_NO_TYPE).to_json()
-            await websocket.send(msg)
+        try:
+            raw_data = json.loads(message)
+        except json.JSONDecodeError:
             return
-        data = raw_data.get(ColName.DATA.value)
-        if not data:
-            msg = messages.ResponseMessage(Code.ERR_NO_MSG).to_json()
-            await websocket.send()
+        mtype = raw_data.get("mtype"):
+        if not mtype:
             return
-        handler = self._shm.get_handler(msg_type)
-        if not handler:
-            msg = messages.ResponseMessage(Code.ERR_NO_HANDLER).to_json()
-            await websocket.send()
-            return
-        await handler.handle(websocket, data)
+        await self._handler.handle(websocket, raw_data)
 
     async def run(self):
         async with ws.serve(self.ws_handler, host="0.0.0.0", port=8001) as server:
@@ -42,9 +32,9 @@ class ReversiServer(object):
 
 
 async def main():
-    shm = ServerHandlerManager()
+    handler = RequestHandler()
 
-    shm.bind(MsgType.PLAYER_ENTER, PlayerEnterServerHandler())
+    handler.mapper.bind(ReqType.PLAYER_ENTER.value)
 
     server = ReversiServer(shm)
     await server.run()
