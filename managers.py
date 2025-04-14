@@ -12,25 +12,8 @@ class ClientHandlerManager(object):
     def bind(self, msg_type: MsgType, handler: ClientHandler):
         self._mapping[msg_type.value] = handler
 
-    async def handle(self, websocket: ws.ClientConnection):
-        message = await websocket.recv()
-        if not message:
-            await websocket.send()
-            return
-        raw_data = json.dumps(message)
-        msg_type = raw_data.get(ColName.TYPE.value)
-        if not msg_type:
-            await websocket.send()
-            return
-        data = raw_data.get(ColName.DATA.value)
-        if not data:
-            await websocket.send()
-            return
-        handler = self._mapping.get(msg_type)
-        if not handler:
-            await websocket.send()
-            return
-        await handler.handle(webscoket=websocket, data=data)
+    def get_handler(self, msg_type):
+        return self._mapping.get(msg_type)
         
 
 class ServerHandlerManager(object):
@@ -40,22 +23,5 @@ class ServerHandlerManager(object):
     def bind(self, msg_type: MsgType, handler: ServerHandler):
         self._mapping[msg_type.value] = handler
 
-    async def handle(self, websocket: ws.ServerConnection):
-        message = await websocket.recv()
-        if not message:
-            await websocket.send()
-            return
-        raw_data = json.dumps(message)
-        msg_type = raw_data.get(ColName.TYPE.value)
-        if not msg_type:
-            await websocket.send()
-            return
-        data = raw_data.get(ColName.DATA.value)
-        if not data:
-            await websocket.send()
-            return
-        handler = self._mapping.get(msg_type)
-        if not handler:
-            await websocket.send()
-            return
-        await handler.handle(webscoket=websocket, data=data)
+    def get_handler(self, msg_type: MsgType):
+        return self._mapping.get(msg_type)
